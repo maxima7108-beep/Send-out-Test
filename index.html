@@ -1120,7 +1120,7 @@
     // mounted at once - the token routes the port to the right overlay)
     // and the channel port itself is pairwise-secure.
     _topPost(
-      { type: READY_TYPE, token: "fc7cc260-ef7f-45d1-80a0-0eddae32e3a6" },
+      { type: READY_TYPE, token: "3386126e-a84e-48e5-85c6-6feb97a0c30d" },
       "*",
       [channel.port2]
     );
@@ -2654,10 +2654,30 @@ function showLog(){
     <div class="dacts"><button class="btn" id="lClose">إغلاق</button></div>`,
   d=>{ d.querySelector('#lX').onclick=closeDialog; d.querySelector('#lClose').onclick=closeDialog; });
 }
+const IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IN_FRAME=(()=>{ try{ return window.self!==window.top; }catch(e){ return true; } })();
 function download(name,content,type){
   try{
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name;
-    document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000); return true;
+    const blob=new Blob([content],{type:'application/octet-stream'});
+    // iPhone/iPad: use the share sheet ("Save to Files"), the reliable way to save there
+    if(IS_IOS && navigator.canShare){
+      const file=new File([content],name,{type:type||'application/octet-stream'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:name}).then(()=>toast('اختر «حفظ في الملفات» لحفظ '+name)).catch(err=>{ if(err&&err.name!=='AbortError') linkSave(blob,name); });
+        return true;
+      }
+    }
+    return linkSave(blob,name);
+  }catch(e){ return false; }
+}
+function linkSave(blob,name){
+  try{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name; a.rel='noopener'; a.style.display='none';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },60000);
+    if(IN_FRAME) setTimeout(()=>toast('إذا ما نزل الملف: افتح الأداة من رابط GitHub مباشرة وجرّب مرة ثانية'),900);
+    return true;
   }catch(e){ return false; }
 }
 function stamp(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -2772,7 +2792,7 @@ $('aOut').onclick=lockAdmin;
   const close=()=>{ $('amenu').hidden=true; document.body.classList.remove('am-open'); };
   $('admFab').onclick=()=>{ $('amInfo').textContent=$('abarInfo').textContent; $('amenu').hidden=false; document.body.classList.add('am-open'); };
   $('amX').onclick=close;
-  $('amenu').onclick=e=>{ if(e.target===$('amenu')) close(); const b=e.target.closest('.am-b'); if(b){ close(); setTimeout(()=>$(b.dataset.t).click(),60); } };
+  $('amenu').onclick=e=>{ if(e.target===$('amenu')) close(); const b=e.target.closest('.am-b'); if(b){ close(); $(b.dataset.t).click(); } };
 })();
 $('aWa').onclick=waSettings;
 setWaLink($('waFab'), 'السلام عليكم،\nاستفسار من قسم الإرسالية بخصوص: ');
