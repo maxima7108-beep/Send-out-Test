@@ -694,6 +694,7 @@ body.is-admin .wafab{bottom:84px}
 .ghsteps{margin:0;padding-inline-start:18px;font-size:13px;line-height:1.9;color:var(--ink2)}
 .verst{display:inline-block;margin-bottom:8px;background:#eef2f7;border-radius:999px;padding:3px 12px;font-size:12px;color:#475569}
 .am-b[data-t=aPub]{grid-column:1/-1;flex-direction:row;justify-content:center;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#fff;border-color:transparent;font-size:15px}
+#q::-webkit-search-cancel-button,#q::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 </style>
 </head>
 <body>
@@ -722,7 +723,7 @@ body.is-admin .wafab{bottom:84px}
   <div class="search">
     <div class="sfield">
       <button class="sicon" id="sBtn" type="button" title="بحث" aria-label="بحث"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
-      <div class="inwrap"><div class="ghost" id="ghost" aria-hidden="true"></div><input id="q" type="text" dir="auto" autocomplete="off" spellcheck="false" placeholder="ابحث باسم التحليل أو اختصاره… مثال: CRP" aria-label="البحث عن تحليل"><span class="tabhint" id="tabhint" hidden>Tab ⇥ للإكمال</span></div>
+      <div class="inwrap"><div class="ghost" id="ghost" aria-hidden="true"></div><input id="q" type="search" name="test-lookup-q" dir="auto" autocomplete="off" autocorrect="off" autocapitalize="off" data-lpignore="true" data-form-type="other" readonly onfocus="this.removeAttribute('readonly')" spellcheck="false" placeholder="ابحث باسم التحليل أو اختصاره… مثال: CRP" aria-label="البحث عن تحليل"><span class="tabhint" id="tabhint" hidden>Tab ⇥ للإكمال</span></div>
       <button class="clr" id="clr" type="button" hidden>مسح</button>
     </div>
     <div class="keys">
@@ -1217,7 +1218,7 @@ let fails=0, lockUntil=0;
 function askPassword(){
   if(admin){ lockAdmin(); return; }
   dialog(`<div class="dh"><span class="dic">${I.shield}</span><div><h4>دخول مشرف القسم</h4><small>التعديل على التحاليل من صلاحيات المشرف فقط</small></div></div>
-    <label class="fl"><span>الرقم السري</span><input id="pw" type="password" inputmode="numeric" autocomplete="off" dir="ltr"></label>
+    <label class="fl"><span>الرقم السري</span><input id="pw" type="password" autocomplete="new-password" inputmode="numeric" autocomplete="off" dir="ltr"></label>
     <div class="err" id="pwErr"></div>
     <div class="dacts"><button class="btn pri" id="pwOk">${I.unlock} دخول</button><button class="btn" id="pwNo">إلغاء</button></div>`,
   d=>{
@@ -1571,9 +1572,9 @@ function ghSettings(thenPublish){
   const c=ghCfg();
   dialog(`<div class="dh"><span class="dic" style="background:#e0e7ff;color:#3730a3">⚙</span><div><h4>إعدادات النشر على GitHub</h4><small>مرة وحدة فقط — تنحفظ على هذا الجهاز</small></div></div>
     <form id="ghf" class="form" autocomplete="off">
-      <label class="fl"><span>اسم الحساب</span><input name="owner" dir="ltr" value="${esc(c.owner)}"></label>
-      <label class="fl"><span>اسم المستودع</span><input name="repo" dir="ltr" value="${esc(c.repo)}"></label>
-      <label class="fl wide"><span>رمز الوصول (Token) *</span><input name="token" type="password" dir="ltr" value="${esc(c.token||'')}" placeholder="github_pat_…"></label>
+      <label class="fl"><span>اسم الحساب</span><input name="owner" autocomplete="off" dir="ltr" value="${esc(c.owner)}"></label>
+      <label class="fl"><span>اسم المستودع</span><input name="repo" autocomplete="off" dir="ltr" value="${esc(c.repo)}"></label>
+      <label class="fl wide"><span>رمز الوصول (Token) *</span><input name="token" type="password" autocomplete="new-password" data-lpignore="true" dir="ltr" value="${esc(c.token||'')}" placeholder="github_pat_…"></label>
       <div class="howto wide" style="grid-column:1/-1"><small>طريقة الحصول على الرمز</small><ol class="ghsteps"><li>GitHub ← Settings ← Developer settings ← Personal access tokens ← <b>Fine-grained tokens</b> ← Generate new token</li><li>Repository access: <b>Only select repositories</b> واختر <b class="ltr">${esc(c.repo)}</b></li><li>Permissions ← Repository permissions ← <b>Contents: Read and write</b></li><li>انسخ الرمز والصقه هنا</li></ol></div>
       <div class="err wide" id="ghErr"></div>
       <div class="dacts wide"><button class="btn pri" type="submit">${I.save} ${thenPublish?'حفظ ونشر':'حفظ'}</button><button class="btn" type="button" id="cNo">إلغاء</button></div>
@@ -1702,7 +1703,9 @@ $('aSheet').onclick=openSheet;
 
 $('foot').innerHTML=(BAKED&&BAKED.savedAt?`<div class="verst">إصدار البيانات: ${fmtDT(BAKED.savedAt)}</div>`:'')+`المصادر: قائمة التحاليل المرسلة لمستشفى المدينة العام، ودليل اختبارات المختبر الإقليمي (MRL Pulse)، ودليل عينات الأمراض المعدية لهيئة الصحة العامة (2024) — تحديث الإتاحة ${fmtDate(DATA.date)}.<br>التحاليل الموجودة في المدينة العام لا تظهر ضمن الإقليمي. التعديل على التحاليل من صلاحيات مشرف القسم.`;
 renderDests(); renderDeps(); renderRecent(); render(); renderAdminBar();
-setTimeout(()=>{ try{ q.focus(); }catch(e){} },60);
+let userTyped=false; q.addEventListener('keydown',()=>{userTyped=true;}); q.addEventListener('paste',()=>{userTyped=true;});
+[50,400,1200,2500].forEach(ms=>setTimeout(()=>{ if(!userTyped && q.value){ q.value=''; render(); updateGhost && updateGhost(); } },ms));
+setTimeout(()=>{ try{ q.removeAttribute('readonly'); q.focus(); }catch(e){} },60);
 </script>
 </body>
 </html>
